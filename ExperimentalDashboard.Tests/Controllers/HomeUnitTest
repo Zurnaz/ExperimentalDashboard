@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web.Mvc;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ExperimentalDashboard;
+using NUnit.Framework;
 using ExperimentalDashboard.Controllers;
+using System.Web.Mvc;
 
 namespace ExperimentalDashboard.Tests.Controllers
 {
-    [TestClass]
-    public class HomeControllerTest
+    [TestFixture]
+    public class UnitTest1
     {
-        [TestMethod]
+        [TestCase]
         public void Index()
         {
             // Arrange
@@ -25,7 +21,7 @@ namespace ExperimentalDashboard.Tests.Controllers
             Assert.IsNotNull(result);
         }
 
-        [TestMethod]
+        [TestCase]
         public void About()
         {
             // Arrange
@@ -38,7 +34,7 @@ namespace ExperimentalDashboard.Tests.Controllers
             Assert.AreEqual("Your application description page.", result.ViewBag.Message);
         }
 
-        [TestMethod]
+        [TestCase]
         public void Contact()
         {
             // Arrange
