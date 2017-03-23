@@ -18,6 +18,12 @@ namespace ExperimentalDashboard
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+
+            routes.MapRoute(
+                name: "PopulationTimeline",
+                url: "{controller}/{action}/{start}/{end}/{top}",
+                defaults: new { controller = "DataSet", action = "CitiesPopulationTimeline", start = UrlParameter.Optional, end = UrlParameter.Optional, top = UrlParameter.Optional, }
+            );
         }
     }
 }

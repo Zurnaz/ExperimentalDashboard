@@ -1,0 +1,131 @@
+﻿
+@{
+    ViewBag.Title = "CitiesPopulationTimeline";
+}
+@section Scripts {
+    @Scripts.Render("~/bundles/treemap")
+    @Scripts.Render("~/bundles/raphael")
+
+    <script type="text/javascript">
+        var population = (function () {
+            var url = "/DataSet/CitiesPopulationService/"
+            var census = [];
+            var labels = [];
+            var data = [];
+            var width = screen.width * 0.5;
+            var height = screen.height * 0.5;
+
+
+            function parseData() {
+                temp = {}
+                for (var i = 0; i < census.length; i++) {
+                    if (typeof temp[census[i]["Country"]] === 'undefined') {
+                        //outer object is country, inner array is a city array first and a  population second
+                        // {UK : [["London", "Manchester"] , [5000, 4000]]}
+                        temp[census[i]["Country"]] = [[], []];
+                    }
+                    temp[census[i]["Country"]][0].push(census[i]["City"]);
+                    temp[census[i]["Country"]][1].push(census[i]["Population"]);
+                }
+                for (var item in temp) {
+                    labels.push(temp[item][0]);
+                    data.push(temp[item][1]);
+                }
+            }
+
+            function renderTree() {
+                if (data && labels) {
+                    $("#treemap").empty();
+                    Treemap.draw("treemap", width, height, data, labels);
+                }
+                else {
+                    alert("No cities returned from query!");
+                }
+            }
+
+            function updateData(inputUrl) {
+                census = [];
+                $.getJSON(inputUrl, function (data) {
+                    census = data;
+                    population.updateGraph();
+                });
+            }
+
+            function selectColor() {
+                var color;
+                //ToDo get a colour pallete that varies in intensity but is unique to each country
+                //However, it will probably not be useable for colour blind people due to encoding too much information into colours
+                return { "fill": color }
+            }
+
+            return {
+                getDataFor: function (year1, year2, top) {
+                    //default if not set
+                    year1 = typeof year1 !== 'undefined' ? year1 : -9999;
+                    year2 = typeof year2 !== 'undefined' ? year2 : 9999;
+                    top = typeof top !== 'undefined' ? top : 100;
+                    //generate query and execute
+                    var query = url + year1 + "/" + year2 + "/" + top + "/";
+                    updateData(query);
+                },
+                updateGraph: function () {
+                    labels = [];
+                    data = [];
+                    parseData();
+                    renderTree();
+                },
+                updateGraphSize: function () {
+                    width = screen.width * 0.5;
+                    height = screen.height * 0.5;
+                    renderTree();
+                },
+                create: function () {
+                    updateData(url);
+                    renderTree();
+                }
+            };
+        })();
+
+        //Bind events
+        window.onresize = function (event) {
+            population.updateGraphSize();
+        };
+
+            $('#update-graph').click(function (e) {
+                var start = $('#input-year-start').val();
+                var end = $('#input-year-end').val();
+                var top = $('#max-cities').val();
+                population.getDataFor(start, end, top);
+            });
+    </script>
+    }
+
+<div class="container-fluid">
+    <h2>CitiesPopulationTimeline</h2>
+    <div id="treemap"></div>
+
+    <div class="form-group row">
+        <label class="col-2 col-form-label" for="input-year-start">Year from</label>
+        <div class="col-10">
+            <input type="text" class="form-control" id="input-year-start" placeholder="-400 for 400 BC">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-2 col-form-label" for="input-year-end">to</label>
+        <div class="col-10">
+            <input type="text" class="form-control" id="input-year-end" placeholder="1200 for 1200 AD">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-2 col-form-label" for="max-cities">City Limit</label>
+        <div class="col-10">
+            <input type="text" class="form-control" id="max-cities" placeholder="100">
+            <small id="max-cities-help" class="form-text text-muted">Input 100 to select the first 100 cities with highest populations between those years <br> Warning: Increasing the number may cause performace issues</small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <button id="update-graph" class="btn btn-primary">Update</button>
+    </div>
+</div>
+

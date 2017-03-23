@@ -25,11 +25,21 @@ namespace ExperimentalDashboard
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
-                      "~/Content/site.css"));
+                      "~/Content/site.css",
+                      "~/Content/multirange.css"));
+
+            bundles.Add(new ScriptBundle("~/bundles/multirange").Include(
+                      "~/Scripts/multirange.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/react").Include(
                       "~/Scripts/react/react.js"));
 
-        }
+            bundles.Add(new ScriptBundle("~/bundles/raphael").Include(
+                      "~/Scripts/raphael.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/treemap").Include(
+                      "~/Scripts/treemap-squared-0.5.min.js"));
+
+        } 
     }
 }
